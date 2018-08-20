@@ -120,18 +120,21 @@ public:
 	}
 
 	// runs function against every element in the matrix
-	Matrix map(double(*func)(double)) {
+	// optional param chance is the odds that the function will be ran (used for GA)
+	Matrix map(double(*func)(double), double chance=1.0) {
 		for (int row = 0; row < m.size(); row++) {
 			for (int col = 0; col < m[row].size(); col++) {
-				m[row][col] = func(m[row][col]);
+				if (chance==1.0 || randomDouble(0, 1) < chance) {
+					m[row][col] = func(m[row][col]);
+				}
 			}
 		}
 		return *this;
 	}
 
-	inline static Matrix Map(Matrix a, double(*func)(double)) {
+	inline static Matrix Map(Matrix a, double(*func)(double), double chance=1.0) {
 		Matrix temp = a;
-		temp.map(func);
+		temp.map(func,chance);
 		return temp;
 	}
 
