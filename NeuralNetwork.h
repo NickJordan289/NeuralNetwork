@@ -114,4 +114,19 @@ public:
 	inline void train(std::vector<double> inputs, std::vector<double> targets, bool debug = false) {
 		train(Matrix::fromVector(inputs), Matrix::fromVector(targets), debug);
 	}
+
+	// maps each weight and bias in place
+	inline void mutate(doubleFunction func, double chance) {
+		weights_ih.map(func, chance);
+		weights_ho.map(func, chance);
+		bias_h.map(func, chance);
+		bias_o.map(func, chance);
+	}
+
+	// maps each weight and bias returning a copy
+	static inline NeuralNetwork mutate(NeuralNetwork a, doubleFunction func, double chance) {
+		NeuralNetwork temp = a;
+		temp.mutate(func, chance);
+		return temp;
+	}
 };
