@@ -131,12 +131,33 @@ public:
 		}
 		return *this;
 	}
-
-	inline static Matrix Map(Matrix a, double(*func)(double), double chance=1.0) {
+	inline static Matrix Map(Matrix a, double(*func)(double), double chance = 1.0) {
 		Matrix temp = a;
-		temp.map(func,chance);
+		temp.map(func, chance);
 		return temp;
 	}
+
+	// runs function against every element in the matrix
+	// function passes in a reference to this matrix along with it
+	// optional param chance is the odds that the function will be ran (used for GA)
+	Matrix map(double(*func)(double,Matrix), double chance = 1.0) {
+		Matrix temp = *this;
+		for (int row = 0; row < m.size(); row++) {
+			for (int col = 0; col < m[row].size(); col++) {
+				if (chance == 1.0 || randomDouble(0, 1) < chance) {
+					temp.m[row][col] = func(temp.m[row][col],*this);
+				}
+			}
+		}
+		*this = temp;
+		return *this;
+	}
+	inline static Matrix Map(Matrix a, double(*func)(double, Matrix), double chance=1.0) {
+		Matrix temp = a;
+		temp.map(func, chance);
+		return temp;
+	}
+
 
 	// returns a transposed copy of the matrix
 	inline Matrix T(void) {
@@ -192,6 +213,12 @@ public:
 		return *this;
 	}
 
+	template<typename T>
+	inline Matrix& operator+= (const T &rhs) {
+		this->add(rhs);
+		return *this;
+	}
+
 	inline Matrix operator- (const Matrix &rhs) {
 		// copy because we dont want to manipulate this object only use it for calculation
 		Matrix lhs = Matrix(m);
@@ -230,6 +257,14 @@ public:
 		return *this;
 	}
 #pragma endregion
+
+	double sum() {
+		double total = 0.0;
+		for (int row = 0; row < m.size(); row++)
+			for (int col = 0; col < m[row].size(); col++)
+				total += m[row][col];
+		return total;
+	}
 
 	template<typename T>
 	static Matrix fromVector(std::vector<T> a) {
