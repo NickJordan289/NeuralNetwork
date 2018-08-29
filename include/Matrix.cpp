@@ -1,25 +1,27 @@
 /*
-	Credit to Daniel Shiffman's videos on Perceptrons, Matrix Math and Neural Networks
+Credit to Daniel Shiffman's videos on Perceptrons, Matrix Math and Neural Networks
 */
 
-#pragma once
-#include <vector>
-#include <iostream>
-#include "ExtraFuncs.h"
+#include "Matrix.h"
 
-class Matrix {
-private:
-	std::vector<std::vector<double>> m;
+namespace nn {
 
-public:
-	Matrix() {
+	Matrix::Matrix() {
 	}
 
-	Matrix(std::vector<std::vector<double>> m) {
+	/*
+		Constructor that copies the contents of another
+	*/
+	Matrix::Matrix(std::vector<std::vector<double>> m) {
 		this->m = m;
 	}
 
-	Matrix(int rows, int columns, bool random = false) {
+	/*
+		Standard Constructor
+		Takes in rows, columns and if it should
+		initialise with random values (def: true)
+	*/
+	Matrix::Matrix(int rows, int columns, bool random) {
 		for (int i = 0; i < rows; i++) {
 			std::vector<double> temp;
 			for (int j = 0; j < columns; j++) {
@@ -31,8 +33,12 @@ public:
 			randomise();
 	}
 
-	// Matrix addition
-	static Matrix add(Matrix a, Matrix b) {
+	/*
+		TODO:
+		Documentation
+		Matrix Addition
+	*/
+	Matrix Matrix::add(Matrix a, Matrix b) {
 		Matrix result = Matrix(a);
 		for (int row = 0; row < result.m.size(); row++) {
 			for (int col = 0; col < result.m[0].size(); col++) {
@@ -42,8 +48,12 @@ public:
 		return result;
 	}
 
-	// Matrix addition
-	Matrix add(Matrix b) {
+	/*
+		TODO:
+		Documentation
+		Matrix Addition
+	*/
+	Matrix Matrix::add(Matrix b) {
 		for (int row = 0; row < m.size(); row++) {
 			for (int col = 0; col < m[0].size(); col++) {
 				m[row][col] += b.m[row][col];
@@ -52,8 +62,12 @@ public:
 		return *this;
 	}
 
-	// Scalar addition
-	void add(double b) {
+	/*
+		TODO:
+		Documentation
+		Scalar Addition
+	*/
+	void Matrix::add(double b) {
 		for (int row = 0; row < m.size(); row++) {
 			for (int col = 0; col < m[row].size(); col++) {
 				m[row][col] += b;
@@ -61,26 +75,45 @@ public:
 		}
 	}
 
-	inline static Matrix subtract(Matrix a, Matrix b) {
+	/*
+		TODO:
+		Documentation
+		Matrix Subtraction
+	*/
+	inline Matrix Matrix::subtract(Matrix a, Matrix b) {
 		Matrix temp = a;
 		temp.sub(b);
 		return temp;
 	}
 
-	void sub(Matrix b) {
+	/*
+		TODO:
+		Documentation
+		Matrix Subtraction
+	*/
+	void Matrix::sub(Matrix b) {
 		for (int row = 0; row < m.size(); row++)
 			for (int col = 0; col < m[row].size(); col++)
 				m[row][col] -= b.m[row][col];
 	}
 
-	inline static Matrix multiply(Matrix a, Matrix b) {
+	/*
+		TODO:
+		Documentation
+		Hadamard Product
+	*/
+	Matrix Matrix::multiply(Matrix a, Matrix b) {
 		Matrix temp = a;
 		temp.multiply(b);
 		return temp;
 	}
 
-	// Hadamard product
-	void multiply(Matrix b) {
+	/*
+		TODO:
+		Documentation
+		Hadamard product
+	*/
+	void Matrix::multiply(Matrix b) {
 		for (int row = 0; row < m.size(); row++) {
 			for (int col = 0; col < m[0].size(); col++) {
 				m[row][col] *= b.m[row][col];
@@ -88,8 +121,12 @@ public:
 		}
 	}
 
-	// Scalar Multiplcation
-	void multiply(double b) {
+	/*
+		TODO:
+		Documentation
+		Scalar Multiplcation
+	*/
+	void Matrix::multiply(double b) {
 		for (int row = 0; row < m.size(); row++) {
 			for (int col = 0; col < m[0].size(); col++) {
 				m[row][col] *= b;
@@ -97,8 +134,13 @@ public:
 		}
 	}
 
-	// produces a a.rows * b.columns matrix
-	static Matrix dot(Matrix a, Matrix b) {
+	/*
+		TODO:
+		Documentation
+		Dot Product
+		produces a a.rows * b.columns matrix
+	*/
+	Matrix Matrix::dot(Matrix a, Matrix b) {
 		// Won't work if columns of A don't equal columns of B
 		if (a.m[0].size() != b.m.size()) {
 			throw std::invalid_argument("incompatible matrix sizes");
@@ -119,56 +161,79 @@ public:
 		return result;
 	}
 
-	// runs function against every element in the matrix
-	// optional param chance is the odds that the function will be ran (used for GA)
-	Matrix map(double(*func)(double), double chance=1.0) {
+	/*
+		runs function against every element in the matrix
+		optional param chance is the odds that the function will be ran (used for GA)
+	*/
+	Matrix Matrix::map(double(*func)(double), double chance) {
 		for (int row = 0; row < m.size(); row++) {
 			for (int col = 0; col < m[row].size(); col++) {
-				if (chance==1.0 || randomDouble(0, 1) < chance) {
+				if (chance == 1.0 || randomDouble(0, 1) < chance) {
 					m[row][col] = func(m[row][col]);
 				}
 			}
 		}
 		return *this;
 	}
-	inline static Matrix Map(Matrix a, double(*func)(double), double chance = 1.0) {
+	/*
+		Static Version
+		runs function against every element in the matrix
+		optional param chance is the odds that the function will be ran (used for GA)
+	*/
+	Matrix Matrix::Map(Matrix a, double(*func)(double), double chance) {
 		Matrix temp = a;
 		temp.map(func, chance);
 		return temp;
 	}
 
-	// runs function against every element in the matrix
-	// function passes in a reference to this matrix along with it
-	// optional param chance is the odds that the function will be ran (used for GA)
-	Matrix map(double(*func)(double,Matrix), double chance = 1.0) {
+	/*
+		runs function against every element in the matrix
+		function passes in a reference to this matrix along with it
+		optional param chance is the odds that the function will be ran (used for GA)
+	*/
+	Matrix Matrix::map(double(*func)(double, Matrix), double chance) {
 		Matrix temp = *this;
 		for (int row = 0; row < m.size(); row++) {
 			for (int col = 0; col < m[row].size(); col++) {
 				if (chance == 1.0 || randomDouble(0, 1) < chance) {
-					temp.m[row][col] = func(temp.m[row][col],*this);
+					temp.m[row][col] = func(temp.m[row][col], *this);
 				}
 			}
 		}
 		*this = temp;
 		return *this;
 	}
-	inline static Matrix Map(Matrix a, double(*func)(double, Matrix), double chance=1.0) {
+
+	/*
+		Static Version
+		runs function against every element in the matrix
+		function passes in a reference to this matrix along with it
+		optional param chance is the odds that the function will be ran (used for GA)
+	*/
+	Matrix Matrix::Map(Matrix a, double(*func)(double, Matrix), double chance) {
 		Matrix temp = a;
 		temp.map(func, chance);
 		return temp;
 	}
 
-
-	// returns a transposed copy of the matrix
-	inline Matrix T(void) {
+	/*
+		TODO:
+		Documentation
+		returns a transposed copy of the matrix
+	*/
+	Matrix Matrix::T(void) {
 		// copy because we dont want to manipulate this object only use it for calculation
 		Matrix temp = *this;
 		temp.transpose();
 		return temp;
 	}
 
-	// swaps rows and columns
-	Matrix transpose() {
+	/*
+		TODO:
+		Documentation
+		swaps rows and columns
+	*/
+	Matrix Matrix::transpose() {
 		Matrix result = Matrix(m[0].size(), m.size(), false);
 		for (int i = 0; i < result.m.size(); i++) {
 			for (int j = 0; j < result.m[0].size(); j++) {
@@ -180,7 +245,7 @@ public:
 	}
 
 #pragma region Operators
-	bool operator== (const Matrix &rhs) {
+	bool Matrix::operator== (const Matrix &rhs) {
 		for (int i = 0; i < m.size(); i++) {
 			for (int j = 0; j < m[0].size(); j++) {
 				if (m[i][j] != rhs.m[i][j])
@@ -190,7 +255,7 @@ public:
 		return true;
 	}
 
-	bool operator== (const std::vector<double> &rhs) {
+	bool Matrix::operator== (const std::vector<double> &rhs) {
 		Matrix temp = Matrix::fromVector(rhs);
 		for (int i = 0; i < m.size(); i++) {
 			for (int j = 0; j < m[0].size(); j++) {
@@ -201,64 +266,65 @@ public:
 		return true;
 	}
 
-	inline Matrix operator+ (const Matrix &rhs) {
+	Matrix Matrix::operator+ (const Matrix &rhs) {
 		// copy because we dont want to manipulate this object only use it for calculation
 		Matrix lhs = Matrix(m);
 		lhs.add(rhs);
 		return lhs;
 	}
 
-	inline Matrix& operator+= (const Matrix &rhs) {
+	Matrix& Matrix::operator+= (const Matrix &rhs) {
 		this->add(rhs);
 		return *this;
 	}
 
-	template<typename T>
-	inline Matrix& operator+= (const T &rhs) {
+	Matrix& Matrix::operator+= (const double &rhs) {
 		this->add(rhs);
 		return *this;
 	}
 
-	inline Matrix operator- (const Matrix &rhs) {
+	Matrix Matrix::operator- (const Matrix &rhs) {
 		// copy because we dont want to manipulate this object only use it for calculation
 		Matrix lhs = Matrix(m);
 		lhs.sub(rhs);
 		return lhs;
 	}
 
-	inline Matrix& operator-= (const Matrix &rhs) {
+	Matrix& Matrix::operator-= (const Matrix &rhs) {
 		this->sub(rhs);
 		return *this;
 	}
 
-	inline Matrix operator* (const Matrix &rhs) {
+	Matrix Matrix::operator* (const Matrix &rhs) {
 		// copy because we dont want to manipulate this object only use it for calculation
 		Matrix lhs = Matrix(m);
 		lhs.multiply(rhs);
 		return lhs;
 	}
 
-	template<typename T>
-	inline Matrix operator* (const T &rhs) {
+	Matrix Matrix::operator* (const double &rhs) {
 		// copy because we dont want to manipulate this object only use it for calculation
 		Matrix lhs = Matrix(m);
 		lhs.multiply(rhs);
 		return lhs;
 	}
 
-	inline Matrix& operator*= (const Matrix &rhs) {
+	Matrix& Matrix::operator*= (const Matrix &rhs) {
 		this->multiply(rhs);
 		return *this;
 	}
 
-	template<typename T>
-	inline Matrix& operator*= (const T &rhs) {
+	Matrix Matrix::operator*= (const double &rhs) {
 		this->multiply(rhs);
 		return *this;
 	}
 #pragma endregion
 
-	double sum() {
+	/*
+		TODO:
+		Documentation
+	*/
+	double Matrix::sum() {
 		double total = 0.0;
 		for (int row = 0; row < m.size(); row++)
 			for (int col = 0; col < m[row].size(); col++)
@@ -266,15 +332,24 @@ public:
 		return total;
 	}
 
-	template<typename T>
-	static Matrix fromVector(std::vector<T> a) {
+	/*
+		TODO:
+		Documentation
+	*/
+	Matrix Matrix::fromVector(std::vector<double> a) {
 		Matrix newMatrix = Matrix(a.size(), 1, false);
 		for (int i = 0; i < a.size(); i++)
 			newMatrix.m[i][0] = a[i];
 		return newMatrix;
 	}
 
-	std::vector<double> toVector() {
+
+
+	/*
+		TODO:
+		Documentation
+	*/
+	std::vector<double> Matrix::toVector() {
 		std::vector<double> temp;
 		for (int row = 0; row < m.size(); row++)
 			for (int col = 0; col < m[row].size(); col++)
@@ -282,13 +357,21 @@ public:
 		return temp;
 	}
 
-	void randomise() {
+	/*
+		TODO:
+		Documentation
+	*/
+	void Matrix::randomise() {
 		for (int row = 0; row < m.size(); row++)
 			for (int col = 0; col < m[row].size(); col++)
 				m[row][col] = randomDouble(-1, 1);
 	}
 
-	void print() {
+	/*
+		TODO:
+		Documentation
+	*/
+	void Matrix::print() {
 		for (int row = 0; row < m.size(); row++) {
 			std::cout << "[";
 			for (int col = 0; col < m[row].size(); col++) {
@@ -304,4 +387,15 @@ public:
 		}
 		std::cout << "\n" << std::endl;
 	}
-};
+
+	/*
+		TODO:
+		Documentation
+	*/
+	double Matrix::randomDouble(double a, double b) {
+		double random = ((double)rand()) / (double)RAND_MAX;
+		double diff = b - a;
+		double r = random * diff;
+		return a + r;
+	}
+}
