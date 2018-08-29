@@ -1,6 +1,8 @@
 # What is this repo for?
 Simple neural network library written in C++ that implements a multilayer perceptron
 
+[Latest Builds](https://github.com/NickJordan289/NeuralNetwork/releases)
+
 # Examples
 [Logical Operators](examples/LogicalOperators.cpp)
 
