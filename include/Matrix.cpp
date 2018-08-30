@@ -5,8 +5,8 @@ Credit to Daniel Shiffman's videos on Perceptrons, Matrix Math and Neural Networ
 #include "Matrix.h"
 
 namespace nn {
-
 	Matrix::Matrix() {
+
 	}
 
 	/*
@@ -33,19 +33,29 @@ namespace nn {
 			randomise();
 	}
 
+#pragma region PrimaryOperations
 	/*
+		Static Version
 		TODO:
 		Documentation
 		Matrix Addition
 	*/
-	Matrix Matrix::add(Matrix a, Matrix b) {
+	Matrix Matrix::Add(Matrix a, Matrix b) {
 		Matrix result = Matrix(a);
-		for (int row = 0; row < result.m.size(); row++) {
-			for (int col = 0; col < result.m[0].size(); col++) {
+		for (int row = 0; row < result.m.size(); row++)
+			for (int col = 0; col < result.m[0].size(); col++)
 				result.m[row][col] = a.m[row][col] + b.m[row][col];
-			}
-		}
 		return result;
+	}
+
+	/*
+		Static Version
+		TODO:
+		Documentation
+		Scalar Addition
+	*/
+	Matrix Matrix::Add(Matrix a, double b) {
+		return a.add(b);
 	}
 
 	/*
@@ -54,11 +64,9 @@ namespace nn {
 		Matrix Addition
 	*/
 	Matrix Matrix::add(Matrix b) {
-		for (int row = 0; row < m.size(); row++) {
-			for (int col = 0; col < m[0].size(); col++) {
+		for (int row = 0; row < m.size(); row++)
+			for (int col = 0; col < m[0].size(); col++)
 				m[row][col] += b.m[row][col];
-			}
-		}
 		return *this;
 	}
 
@@ -67,12 +75,31 @@ namespace nn {
 		Documentation
 		Scalar Addition
 	*/
-	void Matrix::add(double b) {
-		for (int row = 0; row < m.size(); row++) {
-			for (int col = 0; col < m[row].size(); col++) {
+	Matrix Matrix::add(double b) {
+		for (int row = 0; row < m.size(); row++)
+			for (int col = 0; col < m[row].size(); col++)
 				m[row][col] += b;
-			}
-		}
+		return *this;
+	}
+
+	/*
+		Static Version
+		TODO:
+		Documentation
+		Matrix Subtraction
+	*/
+	Matrix Matrix::Subtract(Matrix a, Matrix b) {
+		return a.subtract(b);
+	}
+
+	/*
+		Static Version
+		TODO:
+		Documentation
+		Scalar Subtraction
+	*/
+	Matrix Matrix::Subtract(Matrix a, double b) {
+		return a.subtract(b);
 	}
 
 	/*
@@ -80,32 +107,43 @@ namespace nn {
 		Documentation
 		Matrix Subtraction
 	*/
-	inline Matrix Matrix::subtract(Matrix a, Matrix b) {
-		Matrix temp = a;
-		temp.sub(b);
-		return temp;
-	}
-
-	/*
-		TODO:
-		Documentation
-		Matrix Subtraction
-	*/
-	void Matrix::sub(Matrix b) {
+	Matrix Matrix::subtract(Matrix b) {
 		for (int row = 0; row < m.size(); row++)
 			for (int col = 0; col < m[row].size(); col++)
 				m[row][col] -= b.m[row][col];
+		return *this;
 	}
 
 	/*
+		TODO:
+		Documentation
+		Scalar Subtraction
+	*/
+	Matrix Matrix::subtract(double b) {
+		for (int row = 0; row < m.size(); row++)
+			for (int col = 0; col < m[row].size(); col++)
+				m[row][col] -= b;
+		return *this;
+	}
+
+	/*
+		Static Version
 		TODO:
 		Documentation
 		Hadamard Product
 	*/
-	Matrix Matrix::multiply(Matrix a, Matrix b) {
-		Matrix temp = a;
-		temp.multiply(b);
-		return temp;
+	Matrix Matrix::Multiply(Matrix a, Matrix b) {
+		return a.multiply(b);
+	}
+
+	/*
+		Static Version
+		TODO:
+		Documentation
+		Scalar Multiplication
+	*/
+	Matrix Matrix::Multiply(Matrix a, double b) {
+		return a.multiply(b);
 	}
 
 	/*
@@ -113,12 +151,11 @@ namespace nn {
 		Documentation
 		Hadamard product
 	*/
-	void Matrix::multiply(Matrix b) {
-		for (int row = 0; row < m.size(); row++) {
-			for (int col = 0; col < m[0].size(); col++) {
+	Matrix Matrix::multiply(Matrix b) {
+		for (int row = 0; row < m.size(); row++)
+			for (int col = 0; col < m[0].size(); col++)
 				m[row][col] *= b.m[row][col];
-			}
-		}
+		return *this;
 	}
 
 	/*
@@ -126,13 +163,35 @@ namespace nn {
 		Documentation
 		Scalar Multiplcation
 	*/
-	void Matrix::multiply(double b) {
-		for (int row = 0; row < m.size(); row++) {
-			for (int col = 0; col < m[0].size(); col++) {
+	Matrix Matrix::multiply(double b) {
+		for (int row = 0; row < m.size(); row++)
+			for (int col = 0; col < m[0].size(); col++)
 				m[row][col] *= b;
-			}
-		}
+		return *this;
 	}
+
+	/*
+		Static Version
+		TODO:
+		Documentation
+		Scalar Division
+	*/
+	Matrix Matrix::Divide(Matrix a, double b) {
+		return a.divide(b);
+	}
+
+	/*
+		TODO:
+		Documentation
+		Scalar Division
+	*/
+	Matrix Matrix::divide(double b) {
+		for (int row = 0; row < m.size(); row++)
+			for (int col = 0; col < m[0].size(); col++)
+				m[row][col] /= b;
+		return *this;
+	}
+#pragma endregion
 
 	/*
 		TODO:
@@ -140,7 +199,7 @@ namespace nn {
 		Dot Product
 		produces a a.rows * b.columns matrix
 	*/
-	Matrix Matrix::dot(Matrix a, Matrix b) {
+	Matrix Matrix::Dot(Matrix a, Matrix b) {
 		// Won't work if columns of A don't equal columns of B
 		if (a.m[0].size() != b.m.size()) {
 			throw std::invalid_argument("incompatible matrix sizes");
@@ -166,24 +225,20 @@ namespace nn {
 		optional param chance is the odds that the function will be ran (used for GA)
 	*/
 	Matrix Matrix::map(double(*func)(double), double chance) {
-		for (int row = 0; row < m.size(); row++) {
-			for (int col = 0; col < m[row].size(); col++) {
-				if (chance == 1.0 || randomDouble(0, 1) < chance) {
+		for (int row = 0; row < m.size(); row++)
+			for (int col = 0; col < m[row].size(); col++)
+				if (chance == 1.0 || randomDouble(0, 1) < chance)
 					m[row][col] = func(m[row][col]);
-				}
-			}
-		}
 		return *this;
 	}
+
 	/*
 		Static Version
 		runs function against every element in the matrix
 		optional param chance is the odds that the function will be ran (used for GA)
 	*/
 	Matrix Matrix::Map(Matrix a, double(*func)(double), double chance) {
-		Matrix temp = a;
-		temp.map(func, chance);
-		return temp;
+		return a.map(func, chance);
 	}
 
 	/*
@@ -193,13 +248,10 @@ namespace nn {
 	*/
 	Matrix Matrix::map(double(*func)(double, Matrix), double chance) {
 		Matrix temp = *this;
-		for (int row = 0; row < m.size(); row++) {
-			for (int col = 0; col < m[row].size(); col++) {
-				if (chance == 1.0 || randomDouble(0, 1) < chance) {
+		for (int row = 0; row < m.size(); row++)
+			for (int col = 0; col < m[row].size(); col++)
+				if (chance == 1.0 || randomDouble(0, 1) < chance)
 					temp.m[row][col] = func(temp.m[row][col], *this);
-				}
-			}
-		}
 		*this = temp;
 		return *this;
 	}
@@ -211,9 +263,7 @@ namespace nn {
 		optional param chance is the odds that the function will be ran (used for GA)
 	*/
 	Matrix Matrix::Map(Matrix a, double(*func)(double, Matrix), double chance) {
-		Matrix temp = a;
-		temp.map(func, chance);
-		return temp;
+		return a.map(func, chance);
 	}
 
 	/*
@@ -221,7 +271,7 @@ namespace nn {
 		Documentation
 		returns a transposed copy of the matrix
 	*/
-	Matrix Matrix::T(void) {
+	Matrix Matrix::T() {
 		// copy because we dont want to manipulate this object only use it for calculation
 		Matrix temp = *this;
 		temp.transpose();
@@ -235,38 +285,39 @@ namespace nn {
 	*/
 	Matrix Matrix::transpose() {
 		Matrix result = Matrix(m[0].size(), m.size(), false);
-		for (int i = 0; i < result.m.size(); i++) {
-			for (int j = 0; j < result.m[0].size(); j++) {
+		for (int i = 0; i < result.m.size(); i++)
+			for (int j = 0; j < result.m[0].size(); j++)
 				result.m[i][j] = m[j][i];
-			}
-		}
 		m = result.m;
 		return *this;
 	}
 
 #pragma region Operators
 	bool Matrix::operator== (const Matrix &rhs) {
-		for (int i = 0; i < m.size(); i++) {
-			for (int j = 0; j < m[0].size(); j++) {
+		for (int i = 0; i < m.size(); i++)
+			for (int j = 0; j < m[0].size(); j++)
 				if (m[i][j] != rhs.m[i][j])
 					return false;
-			}
-		}
 		return true;
 	}
 
 	bool Matrix::operator== (const std::vector<double> &rhs) {
-		Matrix temp = Matrix::fromVector(rhs);
-		for (int i = 0; i < m.size(); i++) {
-			for (int j = 0; j < m[0].size(); j++) {
+		Matrix temp = Matrix::FromVector(rhs);
+		for (int i = 0; i < m.size(); i++)
+			for (int j = 0; j < m[0].size(); j++)
 				if (m[i][j] != temp.m[i][j])
 					return false;
-			}
-		}
 		return true;
 	}
 
 	Matrix Matrix::operator+ (const Matrix &rhs) {
+		// copy because we dont want to manipulate this object only use it for calculation
+		Matrix lhs = Matrix(m);
+		lhs.add(rhs);
+		return lhs;
+	}
+
+	Matrix Matrix::operator+(const double & rhs) {
 		// copy because we dont want to manipulate this object only use it for calculation
 		Matrix lhs = Matrix(m);
 		lhs.add(rhs);
@@ -286,12 +337,24 @@ namespace nn {
 	Matrix Matrix::operator- (const Matrix &rhs) {
 		// copy because we dont want to manipulate this object only use it for calculation
 		Matrix lhs = Matrix(m);
-		lhs.sub(rhs);
+		lhs.subtract(rhs);
+		return lhs;
+	}
+
+	Matrix Matrix::operator-(const double & rhs) {
+		// copy because we dont want to manipulate this object only use it for calculation
+		Matrix lhs = Matrix(m);
+		lhs.subtract(rhs);
 		return lhs;
 	}
 
 	Matrix& Matrix::operator-= (const Matrix &rhs) {
-		this->sub(rhs);
+		this->subtract(rhs);
+		return *this;
+	}
+
+	Matrix& Matrix::operator-=(const double & rhs) {
+		this->subtract(rhs);
 		return *this;
 	}
 
@@ -318,6 +381,18 @@ namespace nn {
 		this->multiply(rhs);
 		return *this;
 	}
+
+	Matrix Matrix::operator/ (const double &rhs) {
+		// copy because we dont want to manipulate this object only use it for calculation
+		Matrix lhs = Matrix(m);
+		lhs.divide(rhs);
+		return lhs;
+	}
+
+	Matrix& Matrix::operator/= (const double &rhs) {
+		this->divide(rhs);
+		return *this;
+	}
 #pragma endregion
 
 	/*
@@ -336,14 +411,12 @@ namespace nn {
 		TODO:
 		Documentation
 	*/
-	Matrix Matrix::fromVector(std::vector<double> a) {
+	Matrix Matrix::FromVector(std::vector<double> a) {
 		Matrix newMatrix = Matrix(a.size(), 1, false);
 		for (int i = 0; i < a.size(); i++)
 			newMatrix.m[i][0] = a[i];
 		return newMatrix;
 	}
-
-
 
 	/*
 		TODO:

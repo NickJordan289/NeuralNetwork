@@ -20,20 +20,6 @@ namespace nn {
 	private:
 		std::vector<std::vector<double>> m;
 
-	public:
-		Matrix();
-
-		TESTLIBRARY_API Matrix(std::vector<std::vector<double>> m);
-
-		TESTLIBRARY_API Matrix(int rows, int columns, bool random = false);
-
-		/*
-			TODO:
-			Documentation
-			Matrix Addition
-		*/
-		TESTLIBRARY_API static Matrix add(Matrix a, Matrix b);
-
 		/*
 			TODO:
 			Documentation
@@ -46,42 +32,100 @@ namespace nn {
 			Documentation
 			Scalar Addition
 		*/
-		void add(double b);
+		Matrix add(double b);
 
 		/*
 			TODO:
 			Documentation
 			Matrix Subtraction
 		*/
-		TESTLIBRARY_API static Matrix subtract(Matrix a, Matrix b);
+		Matrix subtract(Matrix b);
 
 		/*
 			TODO:
 			Documentation
-			Matrix Subtraction
+			Scalar Subtraction
 		*/
-		void sub(Matrix b);
-
-		/*
-			TODO:
-			Documentation
-			Hadamard Product
-		*/
-		static Matrix multiply(Matrix a, Matrix b);
+		Matrix subtract(double b);
 
 		/*
 			TODO:
 			Documentation
 			Hadamard product
 		*/
-		void multiply(Matrix b);
+		Matrix multiply(Matrix b);
 
 		/*
 			TODO:
 			Documentation
 			Scalar Multiplcation
 		*/
-		void multiply(double b);
+		Matrix multiply(double b);
+
+		/*
+			TODO:
+			Scalar Division
+		*/
+		Matrix divide(double b);
+
+	public:
+		TESTLIBRARY_API Matrix();
+
+		TESTLIBRARY_API Matrix(std::vector<std::vector<double>> m);
+
+		TESTLIBRARY_API Matrix(int rows, int columns, bool random = false);
+
+#pragma region PrimaryOperations
+		/*
+			TODO:
+			Documentation
+			Matrix Addition
+		*/
+		TESTLIBRARY_API static Matrix Add(Matrix a, Matrix b);
+
+		/*
+			TODO:
+			Documentation
+			Scalar Addition
+		*/
+		TESTLIBRARY_API static Matrix Add(Matrix a, double b);
+
+		/*
+			TODO:
+			Documentation
+			Matrix Subtraction
+		*/
+		TESTLIBRARY_API static Matrix Subtract(Matrix a, Matrix b);
+
+		/*
+			TODO:
+			Documentation
+			Scalar Subtraction
+		*/
+		TESTLIBRARY_API static Matrix Subtract(Matrix a, double b);
+
+		/*
+			TODO:
+			Documentation
+			Hadamard Product
+		*/
+		TESTLIBRARY_API static Matrix Multiply(Matrix a, Matrix b);
+
+		/*
+			TODO:
+			Documentation
+			Scalar Multiplication
+		*/
+		TESTLIBRARY_API static Matrix Multiply(Matrix a, double b);
+
+		/*
+			Static Version
+			TODO:
+			Documentation
+			Scalar Division
+		*/
+		TESTLIBRARY_API static Matrix Divide(Matrix a, double b);
+#pragma endregion
 
 		/*
 			TODO:
@@ -89,7 +133,7 @@ namespace nn {
 			Dot Product
 			produces a a.rows * b.columns matrix
 		*/
-		TESTLIBRARY_API static Matrix dot(Matrix a, Matrix b);
+		TESTLIBRARY_API static Matrix Dot(Matrix a, Matrix b);
 
 		/*
 			runs function against every element in the matrix
@@ -98,9 +142,9 @@ namespace nn {
 		TESTLIBRARY_API Matrix map(double(*func)(double), double chance = 1.0);
 
 		/*
-		runs function against every element in the matrix
-		optional param chance is the odds that the function will be ran (used for GA)
-	*/
+			runs function against every element in the matrix
+			optional param chance is the odds that the function will be ran (used for GA)
+		*/
 		TESTLIBRARY_API static Matrix Map(Matrix a, double(*func)(double), double chance = 1.0);
 
 		/*
@@ -116,7 +160,6 @@ namespace nn {
 			optional param chance is the odds that the function will be ran (used for GA)
 		*/
 		TESTLIBRARY_API static Matrix Map(Matrix a, double(*func)(double, Matrix), double chance = 1.0);
-
 
 		/*
 			TODO:
@@ -134,26 +177,21 @@ namespace nn {
 
 #pragma region Operators
 		TESTLIBRARY_API bool operator== (const Matrix &rhs);
-
 		TESTLIBRARY_API bool operator== (const std::vector<double> &rhs);
-
 		TESTLIBRARY_API Matrix operator+ (const Matrix &rhs);
-
+		TESTLIBRARY_API Matrix operator+ (const double &rhs);
 		TESTLIBRARY_API Matrix& operator+= (const Matrix &rhs);
-
 		TESTLIBRARY_API Matrix& operator+= (const double &rhs);
-
 		TESTLIBRARY_API Matrix operator- (const Matrix &rhs);
-
+		TESTLIBRARY_API Matrix operator- (const double &rhs);
 		TESTLIBRARY_API Matrix& operator-= (const Matrix &rhs);
-
+		TESTLIBRARY_API Matrix& operator-= (const double &rhs);
 		TESTLIBRARY_API Matrix operator* (const Matrix &rhs);
-
 		TESTLIBRARY_API Matrix operator* (const double &rhs);
-
 		TESTLIBRARY_API Matrix& operator*= (const Matrix &rhs);
-
 		TESTLIBRARY_API Matrix operator*= (const double &rhs);
+		TESTLIBRARY_API Matrix operator/ (const double &rhs);
+		TESTLIBRARY_API Matrix& operator/= (const double &rhs);
 #pragma endregion
 		/*
 			TODO:
@@ -165,7 +203,7 @@ namespace nn {
 			TODO:
 			Documentation
 		*/
-		TESTLIBRARY_API static Matrix fromVector(std::vector<double> a);
+		TESTLIBRARY_API static Matrix FromVector(std::vector<double> a);
 
 		/*
 			TODO:
