@@ -14,7 +14,7 @@
 #include <iostream>
 #include <random>
 
-namespace nn {
+namespace ml {
 
 	class Matrix {
 	private:

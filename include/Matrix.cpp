@@ -4,7 +4,7 @@ Credit to Daniel Shiffman's videos on Perceptrons, Matrix Math and Neural Networ
 
 #include "Matrix.h"
 
-namespace nn {
+namespace ml {
 	Matrix::Matrix() {
 
 	}

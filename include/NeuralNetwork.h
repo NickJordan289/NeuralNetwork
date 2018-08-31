@@ -12,7 +12,7 @@
 
 #include "Matrix.h"
 
-namespace nn {
+namespace ml {
 
 	// function pointer type
 	// type name : doubleFunction
@@ -60,7 +60,23 @@ namespace nn {
 		return 1 - pow(tanh(x), 2);
 	}
 
+	inline static double tanh(double x, Matrix) {
+		return (exp(x) - exp(-x)) / (exp(x) + exp(-x));
+	}
+
+	inline static double tanh_d(double x, Matrix) {
+		return 1 - pow(tanh(x), 2);
+	}
+
 	inline static double relu(double x) {
+		return (x < 0) ? 0 : x;
+	}
+
+	inline static double relu_d(double x, Matrix) {
+		return (x < 0) ? 0 : 1;
+	}
+
+	inline static double relu(double x, Matrix) {
 		return (x < 0) ? 0 : x;
 	}
 
@@ -73,6 +89,14 @@ namespace nn {
 	}
 
 	inline static double l_relu_d(double x) {
+		return (x < 0) ? 0.01 : 1;
+	}
+
+	inline static double l_relu(double x, Matrix) {
+		return (x < 0) ? 0.01*x : x;
+	}
+
+	inline static double l_relu_d(double x, Matrix) {
 		return (x < 0) ? 0.01 : 1;
 	}
 
@@ -93,13 +117,13 @@ namespace nn {
 			TODO:
 			Documentation
 		*/
-		TESTLIBRARY_API NeuralNetwork(int, int, int, double=0.1, doubleFunction=nn::sigmoid, doubleFunction=nn::sigmoid_d, matrixFunction=nn::sigmoid, matrixFunction=nn::sigmoid_d);
+		TESTLIBRARY_API NeuralNetwork(int, int, int, double=0.1, doubleFunction=ml::sigmoid, doubleFunction=ml::sigmoid_d, matrixFunction=ml::sigmoid, matrixFunction=ml::sigmoid_d);
 	
 		/*
 			TODO:
 			Documentation
 		*/
-		TESTLIBRARY_API NeuralNetwork(int, std::vector<int>, int, double=0.1, doubleFunction=nn::sigmoid, doubleFunction=nn::sigmoid_d, matrixFunction=nn::sigmoid, matrixFunction=nn::sigmoid_d);
+		TESTLIBRARY_API NeuralNetwork(int, std::vector<int>, int, double=0.1, doubleFunction=ml::sigmoid, doubleFunction=ml::sigmoid_d, matrixFunction=ml::sigmoid, matrixFunction=ml::sigmoid_d);
 
 		/*
 			TODO:

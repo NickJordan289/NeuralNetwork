@@ -5,7 +5,7 @@ Credit to Daniel Shiffman's videos on Perceptrons, Matrix Math and Neural Networ
 #include "NeuralNetwork.h"
 #include "Matrix.h"
 
-namespace nn {
+namespace ml {
 
 	/*
 		TODO:
@@ -62,7 +62,7 @@ namespace nn {
 		// Feed Forward
 		// calculate neuron values between input and hidden
 		// hidden = activation((weights*input)+bias)
-		Matrix hidden0 = Matrix::dot(weights_ih, inputs);
+		Matrix hidden0 = Matrix::Dot(weights_ih, inputs);
 		hidden0 += bias_h0;
 		hidden0.map(activation);
 
@@ -79,7 +79,7 @@ namespace nn {
 		// calculate neuron values between the last hidden layer and output
 		// output = activation((weights*lastHidden)+bias)
 		//Matrix outputs = Matrix::dot(weights_ho, weightsHidden.size() > 1 ? hiddens[hiddens.size()-1] : hidden0);
-		Matrix outputs = Matrix::dot(weights_ho, hidden0);
+		Matrix outputs = Matrix::Dot(weights_ho, hidden0);
 		outputs += bias_o;
 		outputs.map(classifier);
 
@@ -93,7 +93,7 @@ namespace nn {
 		helper function that converts input to matrix before guessing
 	*/
 	Matrix NeuralNetwork::predict(std::vector<double> inputs) {
-		return NeuralNetwork::predict(Matrix::fromVector(inputs));
+		return NeuralNetwork::predict(Matrix::FromVector(inputs));
 	}
 
 	/*
@@ -104,13 +104,13 @@ namespace nn {
 		// Feed Forward
 		// calculate neuron values between input and hidden
 		// hidden = activation((weights*input)+bias)
-		Matrix hidden = Matrix::dot(weights_ih, inputs);
+		Matrix hidden = Matrix::Dot(weights_ih, inputs);
 		hidden += bias_h0;
 		hidden.map(activation);
 
 		// calculate neuron values between hidden and output
 		// output = activation((weights*hidden)+bias)
-		Matrix outputs = Matrix::dot(weights_ho, hidden);
+		Matrix outputs = Matrix::Dot(weights_ho, hidden);
 		outputs += bias_o;
 		outputs.map(classifier);
 
@@ -125,7 +125,7 @@ namespace nn {
 		outputGradients *= trainingRate;
 
 		// hidden->output deltas
-		Matrix hoAdjustments = Matrix::dot(outputGradients, hidden.T());
+		Matrix hoAdjustments = Matrix::Dot(outputGradients, hidden.T());
 		weights_ho += hoAdjustments;
 		bias_o += outputGradients;
 
@@ -133,13 +133,13 @@ namespace nn {
 
 		// error = how far off the output was
 		// gradient = how much each weight influenced the output
-		Matrix hiddenErrors = Matrix::dot(weights_ho.T(), outputErrors);
+		Matrix hiddenErrors = Matrix::Dot(weights_ho.T(), outputErrors);
 		Matrix hiddenGradients = Matrix::Map(hidden, derivative);
 		hiddenGradients *= hiddenErrors;
 		hiddenGradients *= trainingRate;
 
 		// input->hidden deltas
-		Matrix ihAdjustments = Matrix::dot(hiddenGradients, inputs.T());
+		Matrix ihAdjustments = Matrix::Dot(hiddenGradients, inputs.T());
 		weights_ih += ihAdjustments;
 		bias_h0 += hiddenGradients;
 	}
@@ -150,7 +150,7 @@ namespace nn {
 		helper function that converts parameters to matrices before training
 	*/
 	void NeuralNetwork::train(std::vector<double> inputs, std::vector<double> targets) {
-		NeuralNetwork::train(Matrix::fromVector(inputs), Matrix::fromVector(targets));
+		NeuralNetwork::train(Matrix::FromVector(inputs), Matrix::FromVector(targets));
 	}
 
 	/*
@@ -161,9 +161,9 @@ namespace nn {
 		int SAMPLES = inputs.size();
 		for (int i = 0; i < ITERATIONS; i++) {
 			// shuffle data
-			srand(ITERATIONS);
+			srand(i);
 			std::random_shuffle(std::begin(inputs), std::end(inputs));
-			srand(ITERATIONS);
+			srand(i);
 			std::random_shuffle(std::begin(targets), std::end(targets));
 
 			for (int j = 0; j < SAMPLES / BATCH_SIZE; j++) {
@@ -174,13 +174,13 @@ namespace nn {
 					// Feed Forward
 					// calculate neuron values between input and hidden
 					// hidden = activation((weights*input)+bias)
-					Matrix hidden = Matrix::dot(weights_ih, inputs[k]);
+					Matrix hidden = Matrix::Dot(weights_ih, inputs[k]);
 					hidden += bias_h0;
 					hidden.map(activation);
 
 					// calculate neuron values between hidden and output
 					// output = activation((weights*hidden)+bias)
-					Matrix outputs = Matrix::dot(weights_ho, hidden);
+					Matrix outputs = Matrix::Dot(weights_ho, hidden);
 					outputs.map(classifier);
 
 					// Back Propagation
@@ -198,27 +198,29 @@ namespace nn {
 					outputGradients *= trainingRate;
 
 					// hidden->output deltas
-					Matrix hoAdjustments = Matrix::dot(outputGradients, hidden.T());
+					Matrix hoAdjustments = Matrix::Dot(outputGradients, hidden.T());
 					weights_ho += hoAdjustments;
 
 					// Input to Hidden Weights
 
 					// error = how far off the output was
 					// gradient = how much each weight influenced the output
-					Matrix hiddenErrors = Matrix::dot(weights_ho.T(), outputErrors);
+					Matrix hiddenErrors = Matrix::Dot(weights_ho.T(), outputErrors);
 					Matrix hiddenGradients = Matrix::Map(hidden, derivative);
 					hiddenGradients *= hiddenErrors;
 					hiddenGradients *= trainingRate;
 
 					// input->hidden deltas
-					Matrix ihAdjustments = Matrix::dot(hiddenGradients, inputs[k].T());
+					Matrix ihAdjustments = Matrix::Dot(hiddenGradients, inputs[k].T());
 					weights_ih += ihAdjustments;
 				}
 				bias_o += (squaredErrorSum / BATCH_SIZE) * trainingRate;
 				bias_h0 += (squaredErrorSum / BATCH_SIZE) * trainingRate;
 
-				// prints iteration followed by batch number followed by the mean squared error for this batch
-				std::cout << i + 1 << "." << j << ": " << squaredErrorSum / BATCH_SIZE << std::endl; // mean squared error
+				#ifdef DEBUG
+					// prints iteration followed by batch number followed by the mean squared error for this batch
+					std::cout << i + 1 << "." << j << ": " << squaredErrorSum / BATCH_SIZE << std::endl; // mean squared error
+				#endif
 			}
 			if (SAMPLES % BATCH_SIZE != 0) { // remainder batch
 			//std::cout << "----" << ((SAMPLES / BATCH_SIZE)*BATCH_SIZE) << "->" << ((SAMPLES / BATCH_SIZE)*BATCH_SIZE) + (SAMPLES % BATCH_SIZE) - 1 << "----" << std::endl;
@@ -228,13 +230,13 @@ namespace nn {
 					// Feed Forward
 					// calculate neuron values between input and hidden
 					// hidden = activation((weights*input)+bias)
-					Matrix hidden = Matrix::dot(weights_ih, inputs[k]);
+					Matrix hidden = Matrix::Dot(weights_ih, inputs[k]);
 					hidden += bias_h0;
 					hidden.map(activation);
 
 					// calculate neuron values between hidden and output
 					// output = activation((weights*hidden)+bias)
-					Matrix outputs = Matrix::dot(weights_ho, hidden);
+					Matrix outputs = Matrix::Dot(weights_ho, hidden);
 					outputs.map(classifier);
 
 					// Back Propagation
@@ -252,27 +254,29 @@ namespace nn {
 					outputGradients *= trainingRate;
 
 					// hidden->output deltas
-					Matrix hoAdjustments = Matrix::dot(outputGradients, hidden.T());
+					Matrix hoAdjustments = Matrix::Dot(outputGradients, hidden.T());
 					weights_ho += hoAdjustments;
 
 					// Input to Hidden Weights
 
 					// error = how far off the output was
 					// gradient = how much each weight influenced the output
-					Matrix hiddenErrors = Matrix::dot(weights_ho.T(), outputErrors);
+					Matrix hiddenErrors = Matrix::Dot(weights_ho.T(), outputErrors);
 					Matrix hiddenGradients = Matrix::Map(hidden, derivative);
 					hiddenGradients *= hiddenErrors;
 					hiddenGradients *= trainingRate;
 
 					// input->hidden deltas
-					Matrix ihAdjustments = Matrix::dot(hiddenGradients, inputs[k].T());
+					Matrix ihAdjustments = Matrix::Dot(hiddenGradients, inputs[k].T());
 					weights_ih += ihAdjustments;
 				}
 				bias_o += (squaredErrorSum / (SAMPLES % BATCH_SIZE)) * trainingRate;
 				bias_h0 += (squaredErrorSum / (SAMPLES % BATCH_SIZE)) * trainingRate;
 
-				// prints iteration followed by batch number followed by the mean squared error for this batch
-				std::cout << i + 1 << ".rem" << ": " << squaredErrorSum / (SAMPLES % BATCH_SIZE) << std::endl; // mean squared error
+				#ifdef DEBUG
+					// prints iteration followed by batch number followed by the mean squared error for this batch
+					std::cout << i + 1 << ".rem" << ": " << squaredErrorSum / (SAMPLES % BATCH_SIZE) << std::endl; // mean squared error
+				#endif
 			}
 		}
 	}
@@ -285,12 +289,12 @@ namespace nn {
 	void NeuralNetwork::batchTrain(std::vector<std::vector<double>> inputsVector, std::vector<std::vector<double>> targetsVector, int ITERATIONS, int BATCH_SIZE) {
 		std::vector<Matrix> inputs;
 		for (std::vector<double> in : inputsVector)
-			inputs.push_back(Matrix::fromVector(in));
+			inputs.push_back(Matrix::FromVector(in));
 
 		std::vector<Matrix> targets;
 		for (std::vector<double> tar : targetsVector)
-			targets.push_back(Matrix::fromVector(tar));
-
+			targets.push_back(Matrix::FromVector(tar));
+		
 		NeuralNetwork::batchTrain(inputs, targets, ITERATIONS, BATCH_SIZE);
 	}
 
