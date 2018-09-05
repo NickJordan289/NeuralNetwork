@@ -102,8 +102,8 @@ namespace ml {
 
 	class NeuralNetwork {
 	private:
-		Matrix weights_ih, weights_ho, bias_h0, bias_o;
-		double trainingRate;
+		Matrix weights_ih, weights_ho;
+		double bias_h0, bias_o, trainingRate;
 		doubleFunction activation;
 		doubleFunction derivative;
 		matrixFunction classifier;

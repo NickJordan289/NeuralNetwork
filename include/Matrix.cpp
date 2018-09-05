@@ -464,8 +464,9 @@ namespace ml {
 	/*
 		TODO:
 		Documentation
+		This should be in its own file but I was lazy
 	*/
-	double Matrix::randomDouble(double a, double b) {
+	double randomDouble(double a, double b) {
 		double random = ((double)rand()) / (double)RAND_MAX;
 		double diff = b - a;
 		double r = random * diff;

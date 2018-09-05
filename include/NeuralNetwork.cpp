@@ -19,10 +19,10 @@ namespace ml {
 		this->classifierDerivative = classifierDerivative;
 
 		weights_ih = Matrix(hiddenLayerNeurons, inputNeurons, true);
-		bias_h0 = Matrix(hiddenLayerNeurons, 1, true);
+		bias_h0 = ml::randomDouble(-1, 1);
 
 		weights_ho = Matrix(outputNeurons, hiddenLayerNeurons, true);
-		bias_o = Matrix(outputNeurons, 1, true);
+		bias_o = ml::randomDouble(-1, 1);
 	}
 
 	/*
@@ -42,15 +42,15 @@ namespace ml {
 		this->classifierDerivative = classifierDerivative;
 
 		weights_ih = Matrix(hiddenLayersShape[0], inputNeurons, true);
-		bias_h0 = Matrix(hiddenLayersShape[0], 1, true);
+		bias_h0 = ml::randomDouble(-1, 1);
 
 		//for (int i = 1; i < hiddenLayersShape.size(); i++) {
 		//	weightsHidden.push_back(Matrix(hiddenLayersShape[i], hiddenLayersShape[i-1], true));
-		//	biasesHidden.push_back(Matrix(hiddenLayersShape[i], 1, true));
+		//	biasesHidden.push_back(ml::randomDouble(-1, 1));
 		//}
 
 		weights_ho = Matrix(outputNeurons, hiddenLayersShape[hiddenLayersShape.size() - 1], true);
-		bias_o = Matrix(outputNeurons, 1, true);
+		bias_o = ml::randomDouble(-1, 1);
 	}
 
 	/*
@@ -127,7 +127,7 @@ namespace ml {
 		// hidden->output deltas
 		Matrix hoAdjustments = Matrix::Dot(outputGradients, hidden.T());
 		weights_ho += hoAdjustments;
-		bias_o += outputGradients;
+		bias_o += outputGradients.sum() / outputGradients.toVector().size(); // bias = average of the gradients
 
 		// Input to Hidden Weights
 
@@ -141,7 +141,7 @@ namespace ml {
 		// input->hidden deltas
 		Matrix ihAdjustments = Matrix::Dot(hiddenGradients, inputs.T());
 		weights_ih += ihAdjustments;
-		bias_h0 += hiddenGradients;
+		bias_h0 += hiddenGradients.sum() / hiddenGradients.toVector().size(); // bias = average of the gradients
 	}
 
 	/*

@@ -15,7 +15,6 @@
 #include <random>
 
 namespace ml {
-
 	class Matrix {
 	private:
 		std::vector<std::vector<double>> m;
@@ -223,10 +222,12 @@ namespace ml {
 		*/
 		TESTLIBRARY_API void print();
 
-		/*
-			TODO:
-			Documentation
-		*/
-		static double randomDouble(double a, double b);
 	};
+
+	/*
+		TODO:
+		Documentation
+		This should be in its own file but I was lazy
+	*/
+	double randomDouble(double a, double b);
 }
