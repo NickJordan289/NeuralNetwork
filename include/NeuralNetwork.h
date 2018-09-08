@@ -13,7 +13,6 @@
 #include "Matrix.h"
 
 namespace ml {
-
 	// function pointer type
 	// type name : doubleFunction
 	// param1 : double
@@ -109,8 +108,10 @@ namespace ml {
 		matrixFunction classifier;
 		matrixFunction classifierDerivative;
 
-		//std::vector<Matrix> weightsHidden;
-		//std::vector<Matrix> biasesHidden;
+		std::vector<Matrix> weightsHidden;
+		std::vector<double> biasesHidden;
+
+		std::vector<int> hiddenLayersShape;
 
 	public:
 		/*
@@ -128,7 +129,7 @@ namespace ml {
 		/*
 			TODO:
 			Documentation
-			Feed forward implementation
+			Feed Forward Prediction
 		*/
 		TESTLIBRARY_API Matrix predict(Matrix inputs);
 	
@@ -179,4 +180,4 @@ namespace ml {
 		*/
 		TESTLIBRARY_API static NeuralNetwork mutate(NeuralNetwork a, doubleFunction func, double chance);
 	};
-	}
+}

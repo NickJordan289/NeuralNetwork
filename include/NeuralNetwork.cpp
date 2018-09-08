@@ -6,7 +6,6 @@ Credit to Daniel Shiffman's videos on Perceptrons, Matrix Math and Neural Networ
 #include "Matrix.h"
 
 namespace ml {
-
 	/*
 		TODO:
 		Documentation
@@ -35,6 +34,8 @@ namespace ml {
 			return;
 		}
 
+		this->hiddenLayersShape = hiddenLayersShape;
+
 		this->trainingRate = trainingRate;
 		this->activation = activation;
 		this->derivative = derivative;
@@ -42,48 +43,51 @@ namespace ml {
 		this->classifierDerivative = classifierDerivative;
 
 		weights_ih = Matrix(hiddenLayersShape[0], inputNeurons, true);
-		bias_h0 = ml::randomDouble(-1, 1);
+		bias_h0 = randomDouble(-1, 1);
 
-		//for (int i = 1; i < hiddenLayersShape.size(); i++) {
-		//	weightsHidden.push_back(Matrix(hiddenLayersShape[i], hiddenLayersShape[i-1], true));
-		//	biasesHidden.push_back(ml::randomDouble(-1, 1));
-		//}
+		for (int i = 1; i < hiddenLayersShape.size(); i++) {
+			weightsHidden.push_back(Matrix(hiddenLayersShape[i], hiddenLayersShape[i-1], true));
+			biasesHidden.push_back(randomDouble(-1, 1));
+		}
 
 		weights_ho = Matrix(outputNeurons, hiddenLayersShape[hiddenLayersShape.size() - 1], true);
-		bias_o = ml::randomDouble(-1, 1);
+		bias_o = randomDouble(-1, 1);
 	}
+
 
 	/*
 		TODO:
 		Documentation
-		Feed forward implementation
+		Feed Forward Prediction
 	*/
 	Matrix NeuralNetwork::predict(Matrix inputs) {
 		// Feed Forward
+
 		// calculate neuron values between input and hidden
 		// hidden = activation((weights*input)+bias)
 		Matrix hidden0 = Matrix::Dot(weights_ih, inputs);
 		hidden0 += bias_h0;
 		hidden0.map(activation);
 
-		// calculate middle hidden layers
+		// calculate hidden layers after hidden0
 		// hidden = activation((weights*previousLayer)+bias)
-		/*std::vector<Matrix> hiddens;
-		for(int i = 0; i < weightsHidden.size(); i++) {
-		Matrix newHidden = Matrix::dot(weightsHidden[i], (i > 0) ? hiddens[i - 1] : hidden0);
-		newHidden += biasesHidden[i];
-		newHidden.map(activation);
-		hiddens.push_back(newHidden);
-		}*/
+		std::vector<Matrix> hiddens;	
+		if (hiddenLayersShape.size() > 1) {
+			for (int i = 0; i < hiddenLayersShape.size() - 1; i++) {
+				Matrix hidden = Matrix::Dot(weightsHidden[i], (i > 0) ? hiddens[hiddens.size() - 1] : hidden0); // (weightsToLayer, prevLayer)
+				hidden += biasesHidden[i];
+				hidden.map(activation);
+				hiddens.push_back(hidden);
+			}
+		}
 
 		// calculate neuron values between the last hidden layer and output
 		// output = activation((weights*lastHidden)+bias)
-		//Matrix outputs = Matrix::dot(weights_ho, weightsHidden.size() > 1 ? hiddens[hiddens.size()-1] : hidden0);
-		Matrix outputs = Matrix::Dot(weights_ho, hidden0);
+		Matrix outputs = Matrix::Dot(weights_ho, (hiddens.size()>0) ? hiddens[hiddens.size() - 1] : hidden0);
 		outputs += bias_o;
 		outputs.map(classifier);
 
-		// Return the results
+		// return result as Matrix
 		return outputs;
 	}
 
@@ -102,46 +106,88 @@ namespace ml {
 	*/
 	void NeuralNetwork::train(Matrix inputs, Matrix targets) {
 		// Feed Forward
+
 		// calculate neuron values between input and hidden
 		// hidden = activation((weights*input)+bias)
-		Matrix hidden = Matrix::Dot(weights_ih, inputs);
-		hidden += bias_h0;
-		hidden.map(activation);
+		Matrix hidden0 = Matrix::Dot(weights_ih, inputs);
+		hidden0 += bias_h0;
+		hidden0.map(activation);
 
-		// calculate neuron values between hidden and output
-		// output = activation((weights*hidden)+bias)
-		Matrix outputs = Matrix::Dot(weights_ho, hidden);
+		// calculate hidden layers after hidden0
+		// hidden = activation((weights*previousLayer)+bias)
+		std::vector<Matrix> hiddens;
+		if (hiddenLayersShape.size() > 1) {
+			for (int i = 0; i < hiddenLayersShape.size() - 1; i++) {
+				Matrix hidden = Matrix::Dot(weightsHidden[i], (i > 0) ? hiddens[hiddens.size() - 1] : hidden0); // (weightsToLayer, prevLayer)
+				hidden += biasesHidden[i];
+				hidden.map(activation);
+				hiddens.push_back(hidden);
+			}
+		}
+
+		// calculate neuron values between the last hidden layer and output
+		// output = activation((weights*lastHidden)+bias)
+		Matrix outputs = Matrix::Dot(weights_ho, (hiddens.size()>0) ? hiddens[hiddens.size() - 1] : hidden0);
 		outputs += bias_o;
 		outputs.map(classifier);
 
-		// Back Propagation
-		// Hidden to Output Weights
+		// Back prop
+	
+			// h1->o weights
+			// this is always the same (input to first hidden)
 
-		// error = how far off the output was
-		// gradient = how much each weight influenced the output
-		Matrix outputErrors = targets - outputs;
-		Matrix outputGradients = Matrix::Map(outputs, derivative);
-		outputGradients *= outputErrors;
-		outputGradients *= trainingRate;
+			// error = how far off the output was
+			// gradient = how much each weight influenced the output
+			Matrix outputErrors = targets - outputs;
+			Matrix outputGradients = Matrix::Map(outputs, classifierDerivative);
+			outputGradients *= outputErrors;
+			outputGradients *= trainingRate;
 
-		// hidden->output deltas
-		Matrix hoAdjustments = Matrix::Dot(outputGradients, hidden.T());
-		weights_ho += hoAdjustments;
-		bias_o += outputGradients.sum() / outputGradients.toVector().size(); // bias = average of the gradients
+			// hidden->output deltas
+			Matrix hoDeltas = Matrix::Dot(outputGradients, ((hiddens.size()>0) ? hiddens[hiddens.size() - 1] : hidden0).T());
+			weights_ho += hoDeltas;
+			bias_o += outputGradients.sum() / outputGradients.toVector().size(); // bias = average of the gradients
 
-		// Input to Hidden Weights
+			// store the last error because we will modifying it inside the loop and outside
+			Matrix lastError = outputErrors;
 
-		// error = how far off the output was
-		// gradient = how much each weight influenced the output
-		Matrix hiddenErrors = Matrix::Dot(weights_ho.T(), outputErrors);
-		Matrix hiddenGradients = Matrix::Map(hidden, derivative);
-		hiddenGradients *= hiddenErrors;
-		hiddenGradients *= trainingRate;
+			// sub 1 because we want index
+			// i > 0 because 0 is hidden0 which is computed seperately
+			for (int i = hiddenLayersShape.size() - 1; i > 0; i--) { 
+				// VARIABLES TO MAKE THINGS MORE CLEAR
+				Matrix THISLAYER = hiddens[i - 1]; // returns last entry for the first run
+				Matrix NEXTLAYER = (i - 1) > 0 ? hiddens[i - 2] : hidden0; // returns -1 on last run therefore falling back to hidden0
+				Matrix PREVWEIGHTS = (i == hiddenLayersShape.size() - 1) ? weights_ho : weightsHidden[i]; // weights to the right
+				// VARIABLES TO MAKE THINGS MORE CLEAR
 
-		// input->hidden deltas
-		Matrix ihAdjustments = Matrix::Dot(hiddenGradients, inputs.T());
-		weights_ih += ihAdjustments;
-		bias_h0 += hiddenGradients.sum() / hiddenGradients.toVector().size(); // bias = average of the gradients
+				Matrix gradients = Matrix::Map(THISLAYER, derivative);
+				Matrix errors = Matrix::Dot(PREVWEIGHTS.T(), lastError);
+				gradients *= errors;
+				gradients *= trainingRate;
+				Matrix deltas = Matrix::Dot(gradients, NEXTLAYER.T());
+
+				// divide by its layer count, further in layers have less control over the output (may be wrong)
+				weightsHidden[i-1] += deltas/(i+1);
+				biasesHidden[i-1] += gradients.sum() / gradients.toVector().size(); // bias = average of the gradients
+
+				// update error
+				lastError = errors;
+			}
+
+			// i->h0 weights
+			// this is always the same (input to first hidden)
+
+			// error = how far off the output was
+			// gradient = how much each weight influenced the output
+			Matrix hiddenErrors = Matrix::Dot((weightsHidden.size() > 0 ? weightsHidden[0] : weights_ho).T(), lastError);
+			Matrix hiddenGradients = Matrix::Map(hidden0, derivative);
+			hiddenGradients *= hiddenErrors;
+			hiddenGradients *= trainingRate;
+
+			// input->hidden deltas
+			Matrix ihDeltas = Matrix::Dot(hiddenGradients, inputs.T());
+			weights_ih += ihDeltas;
+			bias_h0 += hiddenGradients.sum() / hiddenGradients.toVector().size(); // bias = average of the gradients
 	}
 
 	/*
@@ -305,13 +351,21 @@ namespace ml {
 	*/
 	void NeuralNetwork::mutate(doubleFunction func, double chance) {
 		weights_ih.map(func, chance);
-		weights_ho.map(func, chance);
-		bias_h0.map(func, chance);
-		bias_o.map(func, chance);
 
-		std::cout << "Still using placeholder code in mutate?" << std::endl;
-		//weights_h0h1.map(func, chance);
-		//bias_h1.map(func, chance);
+		for (int i = 0; i < weightsHidden.size(); i++)
+				weightsHidden[i].map(func, chance);
+
+		weights_ho.map(func, chance);
+
+		if (chance == 1.0 || randomDouble(0, 1) < chance)
+			bias_h0 = func(bias_h0);
+
+		for (int i = 0; i < biasesHidden.size(); i++)
+			if (chance == 1.0 || randomDouble(0, 1) < chance)
+				biasesHidden[i] = func(biasesHidden[i]);
+
+		if (chance == 1.0 || randomDouble(0, 1) < chance)
+			bias_o = func(bias_o);
 	}
 
 	/*
