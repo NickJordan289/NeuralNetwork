@@ -416,7 +416,7 @@ namespace ml {
 		Matrix newMatrix = Matrix((rows == -1) ? a.size() : rows, cols, false);
 		for (int row = 0; row < rows; row++)
 			for (int col = 0; col < cols; col++)
-			newMatrix.m[row][col] = a[row*rows+col];
+				newMatrix.m[row][col] = a[col*row+cols];
 		return newMatrix;
 	}
 

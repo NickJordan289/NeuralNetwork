@@ -11,6 +11,7 @@
 #endif  
 
 #include "Matrix.h"
+#include <tuple>
 
 namespace ml {
 	// function pointer type
@@ -99,6 +100,14 @@ namespace ml {
 		return (x < 0) ? 0.01 : 1;
 	}
 
+	enum FUNC {
+		SIGMOID,
+		RELU,
+		LRELU,
+		TANH,
+		SOFTMAX
+	};
+
 	class NeuralNetwork {
 	private:
 		Matrix weights_ih, weights_ho;
@@ -111,7 +120,8 @@ namespace ml {
 		std::vector<Matrix> weightsHidden;
 		std::vector<double> biasesHidden;
 
-		std::vector<int> hiddenLayersShape;
+		std::vector<int> hiddenLayersShape; // leaving this in for code clarity despite redudancy
+		std::tuple<int, std::vector<int>, int> shape;
 
 	public:
 		/*
@@ -125,6 +135,20 @@ namespace ml {
 			Documentation
 		*/
 		TESTLIBRARY_API NeuralNetwork(int, std::vector<int>, int, double=0.1, doubleFunction=ml::sigmoid, doubleFunction=ml::sigmoid_d, matrixFunction=ml::sigmoid, matrixFunction=ml::sigmoid_d);
+
+		/*
+			TODO:
+			Documentation
+			Accepts enum for activation and classifier
+		*/
+		TESTLIBRARY_API NeuralNetwork(int, int, int, double = 0.1, FUNC= FUNC::SIGMOID, FUNC = FUNC::SIGMOID);
+
+		/*
+			TODO:
+			Documentation
+			Accepts enum for activation and classifier
+		*/
+		TESTLIBRARY_API NeuralNetwork(int, std::vector<int>, int, double = 0.1, FUNC = FUNC::SIGMOID, FUNC = FUNC::SIGMOID);
 
 		/*
 			TODO:
@@ -179,5 +203,19 @@ namespace ml {
 			maps each weight and bias returning a copy
 		*/
 		TESTLIBRARY_API static NeuralNetwork mutate(NeuralNetwork a, doubleFunction func, double chance);
+	
+		/*
+			TODO:
+			Documentation
+			Saves neural network config and values to file
+		*/
+		TESTLIBRARY_API void saveToFile(std::string path);
+
+		/*
+			TODO:
+			Documentation
+			Saves neural network config and values to file
+		*/
+		TESTLIBRARY_API static NeuralNetwork LoadFromFile(std::string path);
 	};
 }
