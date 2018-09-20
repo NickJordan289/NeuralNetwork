@@ -34,8 +34,6 @@ namespace ml {
 			return;
 		}
 
-		this->hiddenLayersShape = hiddenLayersShape;
-
 		this->trainingRate = trainingRate;
 		this->activation = activation;
 		this->derivative = derivative;
@@ -52,6 +50,9 @@ namespace ml {
 
 		weights_ho = Matrix(outputNeurons, hiddenLayersShape[hiddenLayersShape.size() - 1], true);
 		bias_o = randomDouble(-1, 1);
+
+		this->hiddenLayersShape = hiddenLayersShape; // leaving this in for code clarity despite redudancy
+		this->shape = std::make_tuple(inputNeurons, hiddenLayersShape, outputNeurons);
 	}
 
 

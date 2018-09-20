@@ -111,7 +111,8 @@ namespace ml {
 		std::vector<Matrix> weightsHidden;
 		std::vector<double> biasesHidden;
 
-		std::vector<int> hiddenLayersShape;
+		std::vector<int> hiddenLayersShape; // leaving this in for code clarity despite redudancy
+		std::tuple<int, std::vector<int>, int> shape;
 
 	public:
 		/*
