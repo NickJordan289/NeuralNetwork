@@ -201,8 +201,9 @@ namespace ml {
 		/*
 			TODO:
 			Documentation
+			if rows and cols are not defined it will create a 1 column matrix
 		*/
-		TESTLIBRARY_API static Matrix FromVector(std::vector<double> a);
+		TESTLIBRARY_API static Matrix FromVector(std::vector<double> a, int rows=-1, int cols=1);
 
 		/*
 			TODO:
