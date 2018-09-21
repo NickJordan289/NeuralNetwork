@@ -413,10 +413,11 @@ namespace ml {
 		if rows and cols are not defined it will create a 1 column matrix
 	*/
 	Matrix Matrix::FromVector(std::vector<double> a, int rows, int cols) {
-		Matrix newMatrix = Matrix((rows == -1) ? a.size() : rows, cols, false);
+		if (rows == -1) rows = a.size();
+		Matrix newMatrix = Matrix(rows, cols, false);
 		for (int row = 0; row < rows; row++)
 			for (int col = 0; col < cols; col++)
-				newMatrix.m[row][col] = a[col*row+cols];
+				newMatrix.m[row][col] = a[col+row*cols];
 		return newMatrix;
 	}
 
