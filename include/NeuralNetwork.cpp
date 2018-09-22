@@ -222,10 +222,6 @@ namespace ml {
 		return *this;
 	}
 
-	/*void swap(NeuralNetwork& first, NeuralNetwork& second) {
-		
-	}*/
-
 	/*
 		TODO:
 		Documentation
