@@ -15,6 +15,14 @@ namespace ml {
 	/*
 		TODO:
 		Documentation
+		Default Constructor
+	*/
+	NeuralNetwork::NeuralNetwork() {
+	}
+
+	/*
+		TODO:
+		Documentation
 	*/
 	NeuralNetwork::NeuralNetwork(int inputNeurons, int hiddenLayerNeurons, int outputNeurons, double trainingRate, doubleFunction activation, doubleFunction derivative, matrixFunction classifier, matrixFunction classifierDerivative) {
 		this->trainingRate = trainingRate;
@@ -28,6 +36,8 @@ namespace ml {
 
 		weights_ho = Matrix(outputNeurons, hiddenLayerNeurons, true);
 		bias_o = ml::randomDouble(-1, 1);
+
+		this->shape = std::make_tuple(inputNeurons, std::vector<int>{ hiddenLayerNeurons }, outputNeurons);
 	}
 
 	/*
@@ -116,6 +126,8 @@ namespace ml {
 
 		weights_ho = Matrix(outputNeurons, hiddenLayerNeurons, true);
 		bias_o = ml::randomDouble(-1, 1);
+
+		this->shape = std::make_tuple(inputNeurons, std::vector<int>{ hiddenLayerNeurons }, outputNeurons);
 	}
 
 	/*
@@ -186,6 +198,28 @@ namespace ml {
 
 		this->hiddenLayersShape = hiddenLayersShape; // leaving this in for code clarity despite redudancy
 		this->shape = std::make_tuple(inputNeurons, hiddenLayersShape, outputNeurons);
+	}
+
+	/*
+		TODO:
+		Documentation
+		Assignment operator overload
+	*/
+	NeuralNetwork NeuralNetwork::operator=(NeuralNetwork rhs) {
+		std::swap(weights_ih, rhs.weights_ih);
+		std::swap(weights_ho, rhs.weights_ho);
+		std::swap(bias_h0, rhs.bias_h0);
+		std::swap(bias_o, rhs.bias_o);
+		std::swap(trainingRate, rhs.trainingRate);
+		std::swap(activation, rhs.activation);
+		std::swap(derivative, rhs.derivative);
+		std::swap(classifier, rhs.classifier);
+		std::swap(classifierDerivative, rhs.classifierDerivative);
+		std::swap(weightsHidden, rhs.weightsHidden);
+		std::swap(biasesHidden, rhs.biasesHidden);
+		std::swap(hiddenLayersShape, rhs.hiddenLayersShape);
+		std::swap(shape, rhs.shape);
+		return *this;
 	}
 
 	/*
@@ -518,7 +552,7 @@ namespace ml {
 		Saves neural network config and values to file
 	*/
 	void NeuralNetwork::saveToFile(std::string filepath) {
-		std::cout << "Saving to " << filepath << std::endl;
+		//std::cout << "Saving to " << filepath << std::endl;
 		std::ofstream file(filepath, std::ofstream::out);
 
 		// [0] - Biases
@@ -566,6 +600,7 @@ namespace ml {
 				file << ';';
 			}
 		}
+		
 
 		// [size-6] - Training Rate
 		file << trainingRate << ';';
@@ -613,7 +648,7 @@ namespace ml {
 		file << std::get<2>(shape);
 
 		file.close();
-		std::cout << "Saved successfully" << std::endl;
+		//std::cout << "Saved successfully" << std::endl;
 	}
 
 	/*
@@ -622,58 +657,125 @@ namespace ml {
 		Saves neural network config and values to file
 	*/
 	NeuralNetwork NeuralNetwork::LoadFromFile(std::string filepath) {
-		std::cout << "Loading from " << filepath << std::endl;
-		std::ifstream file(filepath, std::ifstream::in);
-		std::vector<std::vector<double>> data;
-
-		while (file.good()) {
-			std::string line;
-			getline(file, line, ';'); // different sets of data are seperated by a semicolon
-			std::stringstream values(line);
-			std::vector<double> valsInLine;
-
-			while (values.good()) {
-				std::string newValue;
-				std::getline(values, newValue, ','); // each value in the line is seperated by a comma
-				valsInLine.push_back(std::stod(newValue));
-			}
-			data.push_back(valsInLine);
-		}
-		file.close();
-
-		// Debug Print
-		/*for (int i = 0; i < data.size(); i++) {
-			std::cout << i << ": ";
-			for (int j = 0; j < data[i].size(); j++) {
-				std::cout << "	" << data[i][j] << '\n';
-			}
-			std::cout << std::endl;
-		}*/
-
-		// Input, Hidden, Output Neurons
-		std::tuple<int, std::vector<int>, int> shape;
-		std::get<0>(shape) = int(data[data.size()-3][0]); // input
-		std::get<2>(shape) = int(data[data.size()-1][0]); // output
-		for (int i = 0; i < data[data.size()-2].size(); i++) { // hidden
-			std::get<1>(shape).push_back(data[data.size()-2][i]);
-		}
-
-		// Construct, Training Rate and Activation+Classifier Functions
-		NeuralNetwork nn = NeuralNetwork(std::get<0>(shape), std::get<1>(shape), std::get<2>(shape), data[data.size()-6][0], ml::FUNC(int(data[data.size() - 5][0])), ml::FUNC(int(data[data.size() - 4][0])));
+		//std::cout << "Loading from " << filepath << std::endl;
 		
-		// Biases
-		nn.bias_h0 = data[0][0];
-		nn.bias_o = data[0][1];
-		for (int i = 2; i < data[0].size(); i++)
-			nn.biasesHidden[i - 2] = data[0][i];
+		NeuralNetwork nn = NeuralNetwork();
+		std::ifstream file;
+		file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+		try {
+			file.open(filepath, std::ifstream::in);
+			std::vector<std::vector<double>> data;
 
-		// Weights
-		nn.weights_ih = ml::Matrix::FromVector(data[1], std::get<1>(shape)[0], std::get<0>(shape));
-		nn.weights_ho = ml::Matrix::FromVector(data[2], std::get<2>(shape), std::get<1>(shape)[std::get<1>(shape).size()-1]);
-		for (int i = 3; i < data.size() - 6; i++)
-			nn.weightsHidden[i-3] = ml::Matrix::FromVector(data[i], std::get<1>(shape)[i - 3 + 1], std::get<1>(shape)[i - 3]);
+			while (file.good()) {
+				std::string line;
+				getline(file, line, ';'); // different sets of data are seperated by a semicolon
+				std::stringstream values(line);
+				std::vector<double> valsInLine;
 
-		std::cout << "Loaded successfully" << std::endl;
+				while (values.good()) {
+					std::string newValue;
+					std::getline(values, newValue, ','); // each value in the line is seperated by a comma
+					valsInLine.push_back(std::stod(newValue));
+				}
+				data.push_back(valsInLine);
+			}
+		
+			file.close();
+
+			// Debug Print
+			/*for (int i = 0; i < data.size(); i++) {
+				std::cout << i << ": ";
+				for (int j = 0; j < data[i].size(); j++) {
+					std::cout << "	" << data[i][j] << '\n';
+				}
+				std::cout << std::endl;
+			}*/
+
+			// Input, Hidden, Output Neurons
+			std::tuple<int, std::vector<int>, int> shape;
+			std::get<0>(shape) = int(data[data.size()-3][0]); // input
+			std::get<2>(shape) = int(data[data.size()-1][0]); // output
+			for (int i = 0; i < data[data.size()-2].size(); i++) { // hidden
+				std::get<1>(shape).push_back(data[data.size()-2][i]);
+			}
+
+			// Construct, Training Rate and Activation+Classifier Functions
+			int a = std::get<0>(shape);
+			std::vector<int> b = std::get<1>(shape);
+			int c = std::get<2>(shape);
+			double d = data[data.size() - 6][0];
+			ml::FUNC e = ml::FUNC(int(data[data.size() - 5][0]));
+			ml::FUNC f = ml::FUNC(int(data[data.size() - 4][0]));
+			nn = NeuralNetwork(a,b,c,d,e,f); // funcs and trainingRate don't work with custom assignment operator
+
+			nn.shape = shape;
+			nn.hiddenLayersShape = b;
+
+			// I've done something wrong so all of these values need to be entered manually
+			nn.trainingRate = d;
+
+			switch (e) {
+			case SIGMOID:
+				nn.activation = sigmoid;
+				nn.derivative = sigmoid_d;
+				break;
+			case RELU:
+				nn.activation = relu;
+				nn.derivative = relu_d;
+				break;
+			case LRELU:
+				nn.activation = l_relu;
+				nn.derivative = l_relu_d;
+				break;
+			case TANH:
+				nn.activation = ml::tanh;
+				nn.derivative = tanh_d;
+				break;
+			}
+
+			switch (f) {
+			case SIGMOID:
+				nn.classifier = sigmoid;
+				nn.classifierDerivative = sigmoid_d;
+				break;
+			case RELU:
+				nn.classifier = relu;
+				nn.classifierDerivative = relu_d;
+				break;
+			case LRELU:
+				nn.classifier = l_relu;
+				nn.classifierDerivative = l_relu_d;
+				break;
+			case TANH:
+				nn.classifier = ml::tanh;
+				nn.classifierDerivative = tanh_d;
+				break;
+			case SOFTMAX:
+				nn.classifier = ml::softmax;
+				nn.classifierDerivative = softmax_d;
+				break;
+			}
+		
+			// Biases
+			nn.bias_h0 = data[0][0];
+			nn.bias_o = data[0][1];
+			for (int i = 2; i < data[0].size(); i++) {
+				nn.biasesHidden[i - 2] = data[0][i];
+			}
+
+			// Weights
+			nn.weights_ih = ml::Matrix::FromVector(data[1], std::get<1>(shape)[0], std::get<0>(shape));
+			nn.weights_ho = ml::Matrix::FromVector(data[2], std::get<2>(shape), std::get<1>(shape)[std::get<1>(shape).size()-1]);
+			if (std::get<1>(shape).size() > 0) {
+				for (int i = 3; i < data.size() - 6; i++)
+					nn.weightsHidden[i - 3] = ml::Matrix::FromVector(data[i], std::get<1>(shape)[i - 3 + 1], std::get<1>(shape)[i - 3]);
+			}
+
+			//std::cout << "Loaded successfully" << std::endl;
+		}
+		catch (const std::ifstream::failure& e) {
+			throw std::exception("Error reading file");
+		}
 		return nn;
 	}
 }

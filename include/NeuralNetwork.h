@@ -12,6 +12,7 @@
 
 #include "Matrix.h"
 #include <tuple>
+#include <vector>
 
 namespace ml {
 	// function pointer type
@@ -109,7 +110,7 @@ namespace ml {
 	};
 
 	class NeuralNetwork {
-	private:
+	public:
 		Matrix weights_ih, weights_ho;
 		double bias_h0, bias_o, trainingRate;
 		doubleFunction activation;
@@ -124,6 +125,13 @@ namespace ml {
 		std::tuple<int, std::vector<int>, int> shape;
 
 	public:
+		/*
+			TODO:
+			Documentation
+			Default Constructor
+		*/
+		TESTLIBRARY_API NeuralNetwork();
+
 		/*
 			TODO:
 			Documentation
@@ -149,6 +157,13 @@ namespace ml {
 			Accepts enum for activation and classifier
 		*/
 		TESTLIBRARY_API NeuralNetwork(int, std::vector<int>, int, double = 0.1, FUNC = FUNC::SIGMOID, FUNC = FUNC::SIGMOID);
+
+		/*
+			TODO:
+			Documentation
+			Assignment operator overload
+		*/
+		TESTLIBRARY_API NeuralNetwork operator=(NeuralNetwork);
 
 		/*
 			TODO:
