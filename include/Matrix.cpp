@@ -3,6 +3,7 @@ Credit to Daniel Shiffman's videos on Perceptrons, Matrix Math and Neural Networ
 */
 
 #include "Matrix.h"
+#include <stdexcept>
 
 namespace ml {
 	Matrix::Matrix() {
