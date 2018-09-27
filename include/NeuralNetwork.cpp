@@ -774,7 +774,7 @@ namespace ml {
 			//std::cout << "Loaded successfully" << std::endl;
 		}
 		catch (const std::ifstream::failure& e) {
-			throw std::exception("Error reading file");
+			//throw std::exception("Error reading file");
 		}
 		return nn;
 	}
