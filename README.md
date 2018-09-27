@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/NickJordan289/NeuralNetwork.svg?branch=master)](https://travis-ci.org/NickJordan289/NeuralNetwork)
+
 # What is this repo for?
 Simple neural network library written in C++ that implements a multilayer perceptron
 
