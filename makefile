@@ -2,7 +2,7 @@ CC = g++
 LIB_INPUTS = ./include/Matrix.cpp ./include/NeuralNetwork.cpp
 LIB_OUTPUTS = Matrix.o NeuralNetwork.o
 EXPORT_FLAG = TESTLIBRARY_EXPORTS
-EXTRA_FLAGS = -std=c++11 -Wall -Os
+EXTRA_FLAGS = -std=c++11 -Wall -Os -fPIC
 LIB_NAME = NeuralNetwork
 STATIC_EXTENSION = lib #a
 DYNAMIC_EXTENSION = dll #so
