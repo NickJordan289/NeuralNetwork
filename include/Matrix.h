@@ -5,9 +5,9 @@
 #pragma once
 
 #ifdef TESTLIBRARY_EXPORTS  
-#define TESTLIBRARY_API __declspec(dllexport)   
+#define TESTLIBRARY_API __attribute__ ((dllexport))   
 #else  
-#define TESTLIBRARY_API __declspec(dllimport)   
+#define TESTLIBRARY_API __attribute__ ((dllimport))   
 #endif  
 
 #include <vector>

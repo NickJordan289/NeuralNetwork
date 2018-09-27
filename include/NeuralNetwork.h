@@ -5,9 +5,9 @@
 #pragma once
 
 #ifdef TESTLIBRARY_EXPORTS  
-#define TESTLIBRARY_API __declspec(dllexport)   
+#define TESTLIBRARY_API __attribute__ ((dllexport))   
 #else  
-#define TESTLIBRARY_API __declspec(dllimport)   
+#define TESTLIBRARY_API __attribute__ ((dllimport))   
 #endif  
 
 #include "Matrix.h"
@@ -49,8 +49,9 @@ namespace ml {
 	}
 
 	inline static double softmax_d(double x, Matrix a) {
-		throw std::exception("Not implemented");
+		//throw std::exception("Not implemented");
 		//return a.map(exp).sum();
+		return -1.0;
 	}
 
 	inline static double tanh(double x) {
