@@ -6,6 +6,8 @@ Simple neural network library written in C++ that implements a multilayer percep
 [Latest Builds](https://github.com/NickJordan289/NeuralNetwork/releases)
 
 # Examples
+[MNIST](examples/MNIST)
+
 [Logical Operators](examples/LogicalOperators.cpp)
 
 [Flappy Bird NEAT](https://github.com/NickJordan289/NEAT-Games/tree/master/FlappyBird)
