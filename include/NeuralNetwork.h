@@ -4,10 +4,18 @@
 
 #pragma once
 
-#ifdef TESTLIBRARY_EXPORTS  
-#define TESTLIBRARY_API __attribute__ ((dllexport))   
+#ifdef TESTLIBRARY_EXPORTS
+	#ifdef __GNUC__
+		#define TESTLIBRARY_API __attribute__ ((dllexport)) 
+	#else
+		#define TESTLIBRARY_API _declspec (dllexport)
+	#endif
 #else  
-#define TESTLIBRARY_API __attribute__ ((dllimport))   
+	#ifdef __GNUC__
+		#define TESTLIBRARY_API __attribute__ ((dllimport))
+	#else
+		#define TESTLIBRARY_API _declspec (dllimport)   
+	#endif
 #endif  
 
 #include "Matrix.h"
